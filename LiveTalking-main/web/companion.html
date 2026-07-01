@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>情感陪护数字人 - 小暖</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 20px;
+    }
+    
+    /* 左侧：数字人视频区 */
+    .video-section {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .video-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .video-header h2 {
+        color: #333;
+        font-size: 20px;
+    }
+    
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .status-online {
+        background: #e6f7e6;
+        color: #52c41a;
+    }
+    
+    .status-offline {
+        background: #f5f5f5;
+        color: #999;
+    }
+    
+    #video {
+        width: 100%;
+        border-radius: 12px;
+        background: #f0f0f0;
+    }
+    
+    .video-controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+    
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+    }
+    
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+    
+    .btn-danger {
+        background: #ff4d4f;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #ff7875;
+    }
+    
+    .btn-record {
+        background: #52c41a;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .btn-recording {
+        background: #ff4d4f;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    /* 右侧：对话区 */
+    .chat-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        height: 600px;
+    }
+    
+    .chat-header {
+        padding: 20px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .chat-header h3 {
+        color: #333;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .message {
+        max-width: 85%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.6;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message-user {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+    
+    .message-ai {
+        align-self: flex-start;
+        background: #f5f5f5;
+        color: #333;
+        border-bottom-left-radius: 4px;
+    }
+    
+    .message-time {
+        font-size: 11px;
+        opacity: 0.6;
+        margin-top: 4px;
+    }
+    
+    .typing-indicator {
+        display: none;
+        align-self: flex-start;
+        padding: 12px 16px;
+        background: #f5f5f5;
+        border-radius: 16px;
+        border-bottom-left-radius: 4px;
+    }
+    
+    .typing-indicator.active {
+        display: flex;
+        gap: 4px;
+    }
+    
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #999;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+    }
+    
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-10px); }
+    }
+    
+    .chat-input-area {
+        padding: 15px 20px;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    .input-container {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+    
+    textarea {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        resize: none;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+    
+    textarea:focus {
+        border-color: #667eea;
+    }
+    
+    .input-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .icon-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 18px;
+    }
+    
+    .voice-wave {
+        display: none;
+        align-items: center;
+        gap: 3px;
+        height: 30px;
+        padding: 0 15px;
+    }
+    
+    .voice-wave.active {
+        display: flex;
+    }
+    
+    .voice-bar {
+        width: 4px;
+        background: #667eea;
+        border-radius: 2px;
+        animation: wave 0.5s ease-in-out infinite;
+    }
+    
+    @keyframes wave {
+        0%, 100% { height: 10%; }
+        50% { height: 100%; }
+    }
+    
+    /* 欢迎消息 */
+    .welcome-message {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+    }
+    
+    .welcome-message h4 {
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+    
+    /* 角色选择器 */
+    .character-selector {
+        margin-bottom: 15px;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .character-selector label {
+        font-size: 14px;
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .character-selector select {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+        outline: none;
+    }
+    
+    .character-selector select:focus {
+        border-color: #667eea;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 900px) {
+        .container {
+            grid-template-columns: 1fr;
+        }
+        
+        .chat-section {
+            height: 400px;
+        }
+    }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 左侧：数字人视频 -->
+    <div class="video-section">
+        <div class="video-header">
+            <h2>🎭 数字人 <span id="char-name">小暖</span></h2>
+            <span id="status-badge" class="status-badge status-offline">离线</span>
+        </div>
+        
+        <!-- 角色选择器 -->
+        <div class="character-selector">
+            <label>选择陪伴角色：</label>
+            <select id="character-select" onchange="switchCharacter()">
+                <option value="xiaonuan">🌸 小暖（女声温柔）</option>
+                <option value="male">👨 小宇（男声沉稳）</option>
+            </select>
+        </div>
+        
+        <video id="video" autoplay playsinline poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect fill='%23f0f0f0' width='640' height='360'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='20'%3E点击开始连接数字人%3C/text%3E%3C/svg%3E">
+            您的浏览器不支持视频标签
+        </video>
+        
+        <div class="video-controls">
+            <button id="start" class="btn-primary" onclick="start()">🚀 开始连接</button>
+            <button id="stop" class="btn-danger" style="display: none" onclick="stop()">⏹ 断开</button>
+            <button id="btn_record" class="btn-record icon-btn" onclick="toggleRecording()">🎤</button>
+            <button class="btn-secondary" onclick="clearChat()">🗑 清空对话</button>
+        </div>
+        
+        <!-- 隐藏元素，用于兼容 client.js -->
+        <div style="display: none;">
+            <input type="checkbox" id="use-stun" checked>
+            <audio id="audio" autoplay></audio>
+        </div>
+        
+        <div id="voice-wave" class="voice-wave">
+            <div class="voice-bar" style="animation-delay: 0s"></div>
+            <div class="voice-bar" style="animation-delay: 0.1s"></div>
+            <div class="voice-bar" style="animation-delay: 0.2s"></div>
+            <div class="voice-bar" style="animation-delay: 0.3s"></div>
+            <div class="voice-bar" style="animation-delay: 0.4s"></div>
+        </div>
+    </div>
+    
+    <!-- 右侧：对话区 -->
+    <div class="chat-section">
+        <div class="chat-header">
+            <h3>💬 陪伴对话</h3>
+        </div>
+        
+        <div id="chat-messages" class="chat-messages">
+            <div class="welcome-message">
+                <h4 id="welcome-title">👋 你好！我是小暖</h4>
+                <p id="welcome-desc">你的专属情感陪护助手<br>点击左侧"开始连接"开始对话</p>
+            </div>
+        </div>
+        
+        <div id="typing-indicator" class="typing-indicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+        
+        <div class="chat-input-area">
+            <div class="input-container">
+                <textarea id="message-input" rows="2" placeholder="输入消息，按Enter发送..."></textarea>
+                <div class="input-buttons">
+                    <button class="btn-primary icon-btn" onclick="sendMessage()">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="sessionid" value="0">
+
+<script src="client.js"></script>
+<script>
+// ============ 对话系统 ============
+
+let conversationHistory = [];
+let isRecording = false;
+let mediaRecorder = null;
+let audioChunks = [];
+
+// 添加消息到对话框
+function addMessage(text, isUser = false) {
+    const chatMessages = document.getElementById('chat-messages');
+    const welcomeMsg = chatMessages.querySelector('.welcome-message');
+    if (welcomeMsg) {
+        welcomeMsg.remove();
+    }
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isUser ? 'message-user' : 'message-ai'}`;
+    
+    const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    
+    messageDiv.innerHTML = `
+        <div>${escapeHtml(text)}</div>
+        <div class="message-time">${time}</div>
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // 保存到历史
+    conversationHistory.push({
+        role: isUser ? 'user' : 'assistant',
+        content: text,
+        time: time
+    });
+}
+
+// 显示正在输入
+function showTyping() {
+    document.getElementById('typing-indicator').classList.add('active');
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function hideTyping() {
+    document.getElementById('typing-indicator').classList.remove('active');
+}
+
+// HTML转义
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// 发送消息
+async function sendMessage() {
+    const input = document.getElementById('message-input');
+    const text = input.value.trim();
+    
+    if (!text) return;
+    
+    // 检查是否已连接
+    const sessionid = document.getElementById('sessionid').value;
+    if (sessionid === '0') {
+        alert('请先点击"开始连接"启动数字人');
+        return;
+    }
+    
+    // 添加用户消息
+    addMessage(text, true);
+    input.value = '';
+    
+    // 显示正在输入
+    showTyping();
+    
+    // 发送到后端
+    try {
+        const response = await fetch('/human', {
+            body: JSON.stringify({
+                text: text,
+                type: 'chat',
+                interrupt: true,
+                sessionid: parseInt(sessionid)
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            // AI回复会通过数字人播报，我们等待一段时间后显示文字
+            // 实际项目中可以通过WebSocket接收AI回复
+            setTimeout(() => {
+                hideTyping();
+            }, 1000);
+        } else {
+            hideTyping();
+            addMessage('抱歉，我遇到了一点问题，请稍后再试。', false);
+        }
+    } catch (error) {
+        console.error('发送失败:', error);
+        hideTyping();
+        addMessage('网络连接失败，请检查网络。', false);
+    }
+}
+
+// 清空对话
+function clearChat() {
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.innerHTML = `
+        <div class="welcome-message">
+            <h4>👋 对话已清空</h4>
+            <p>让我们开始新的对话吧</p>
+        </div>
+    `;
+    conversationHistory = [];
+}
+
+// 语音输入
+async function toggleRecording() {
+    if (!isRecording) {
+        // 开始录音
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunks.push(event.data);
+            };
+            
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                await processVoiceInput(audioBlob);
+            };
+            
+            mediaRecorder.start();
+            isRecording = true;
+            
+            // 更新UI
+            const btn = document.getElementById('btn_record');
+            btn.classList.add('btn-recording');
+            btn.textContent = '⏹';
+            document.getElementById('voice-wave').classList.add('active');
+            
+        } catch (err) {
+            console.error('录音失败:', err);
+            alert('无法访问麦克风，请检查权限设置');
+        }
+    } else {
+        // 停止录音
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        isRecording = false;
+        
+        // 更新UI
+        const btn = document.getElementById('btn_record');
+        btn.classList.remove('btn-recording');
+        btn.textContent = '🎤';
+        document.getElementById('voice-wave').classList.remove('active');
+    }
+}
+
+// 处理语音输入
+async function processVoiceInput(audioBlob) {
+    // 显示用户正在说话
+    addMessage('🎤 语音输入中...', true);
+    showTyping();
+    
+    // 将音频转为base64
+    const reader = new FileReader();
+    reader.readAsDataURL(audioBlob);
+    reader.onloadend = async () => {
+        const base64Audio = reader.result.split(',')[1];
+        
+        // 发送到后端进行语音识别和对话
+        try {
+            const sessionid = document.getElementById('sessionid').value;
+            
+            // 先上传音频文件
+            const formData = new FormData();
+            formData.append('file', audioBlob, 'voice.wav');
+            formData.append('sessionid', sessionid);
+            
+            // 这里可以扩展为调用语音识别API
+            // 目前先使用简单的文本输入方式
+            
+            hideTyping();
+            
+            // 更新最后一条消息
+            const messages = document.querySelectorAll('.message');
+            const lastMsg = messages[messages.length - 1];
+            if (lastMsg && lastMsg.classList.contains('message-user')) {
+                lastMsg.querySelector('div').textContent = '[语音] 请使用文字输入或等待语音功能完善';
+            }
+            
+        } catch (error) {
+            console.error('语音处理失败:', error);
+            hideTyping();
+            addMessage('语音识别失败，请尝试文字输入。', false);
+        }
+    };
+}
+
+// 监听Enter键
+document.getElementById('message-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+// 更新连接状态
+function updateStatus(connected) {
+    const badge = document.getElementById('status-badge');
+    if (connected) {
+        badge.textContent = '在线';
+        badge.className = 'status-badge status-online';
+    } else {
+        badge.textContent = '离线';
+        badge.className = 'status-badge status-offline';
+    }
+}
+
+// 角色配置
+const CHARACTERS = {
+    xiaonuan: {
+        name: '小暖',
+        avatar: 'wav2lip256_avatar1',
+        tts: 'edgetts',
+        voice: 'zh-CN-XiaoxiaoNeural',
+        welcome: '你好！我是小暖，很高兴陪伴你。有什么想和我聊聊的吗？',
+        desc: '你的专属情感陪护助手'
+    },
+    male: {
+        name: '小宇',
+        avatar: 'male_avatar',
+        tts: 'siliconflow',
+        voice: 'alex',
+        welcome: '你好！我是小宇，很高兴陪伴你。有什么想聊的吗？',
+        desc: '你的专属情感陪护助手'
+    }
+};
+
+// 从 URL 参数获取角色
+function getUrlParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+// 初始化角色
+let currentCharacter = getUrlParam('character') || 'xiaonuan';
+let currentAvatar = getUrlParam('avatar') || 'wav2lip256_avatar1';
+
+// 页面加载时应用 URL 参数
+window.addEventListener('DOMContentLoaded', () => {
+    // 设置角色选择器
+    const select = document.getElementById('character-select');
+    if (select) {
+        select.value = currentCharacter;
+    }
+    
+    // 更新 UI
+    updateCharacterUI();
+});
+
+// 更新角色 UI
+function updateCharacterUI() {
+    const char = CHARACTERS[currentCharacter];
+    if (!char) return;
+    
+    // 更新标题
+    const charNameEl = document.getElementById('char-name');
+    if (charNameEl) charNameEl.textContent = char.name;
+    
+    // 更新欢迎消息
+    const welcomeTitleEl = document.getElementById('welcome-title');
+    if (welcomeTitleEl) welcomeTitleEl.textContent = `👋 你好！我是${char.name}`;
+    
+    // 更新选择器
+    const select = document.getElementById('character-select');
+    if (select) select.value = currentCharacter;
+    
+    console.log(`已加载角色: ${char.name}, avatar: ${currentAvatar}`);
+}
+
+// 切换角色
+async function switchCharacter() {
+    const select = document.getElementById('character-select');
+    const charId = select.value;
+    const char = CHARACTERS[charId];
+    
+    if (charId === currentCharacter) return;
+    
+    // 更新当前角色
+    currentCharacter = charId;
+    currentAvatar = char.avatar;
+    
+    // 更新UI
+    updateCharacterUI();
+    
+    // 发送角色切换请求到后端
+    const sessionid = document.getElementById('sessionid').value;
+    if (sessionid !== '0') {
+        try {
+            const response = await fetch('/switch_character', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    character: charId,
+                    avatar_id: char.avatar,
+                    sessionid: parseInt(sessionid)
+                })
+            });
+            
+            const result = await response.json();
+            console.log('切换角色结果:', result);
+            
+            // 重新连接以加载新形象
+            stop();
+            setTimeout(() => {
+                start();
+                setTimeout(() => {
+                    addMessage(`已切换到${char.name}！${char.welcome}`, false);
+                }, 1000);
+            }, 500);
+        } catch (error) {
+            console.error('切换角色失败:', error);
+        }
+    }
+}
+
+// 重写原有的start和stop函数
+const originalClientStart = window.start;
+const originalClientStop = window.stop;
+
+window.start = function() {
+    // 先调用原始的 client.js start 函数
+    if (originalClientStart) {
+        try {
+            originalClientStart();
+        } catch (e) {
+            console.error('client.js start 错误:', e);
+        }
+    }
+    
+    updateStatus(true);
+    
+    const charConfig = CHARACTERS[currentCharacter];
+    addMessage(charConfig.welcome, false);
+};
+
+window.stop = function() {
+    // 先调用原始的 client.js stop 函数
+    if (originalClientStop) {
+        try {
+            originalClientStop();
+        } catch (e) {
+            console.error('client.js stop 错误:', e);
+        }
+    }
+    
+    updateStatus(false);
+};
+</script>
+
+</body>
+</html>

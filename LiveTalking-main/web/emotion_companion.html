@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>情感陪护数字人 - 小暖</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        background: linear-gradient(135deg, #fdf2f8 0%, #fff7ed 50%, #fef3c7 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+    
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 480px 1fr;
+        gap: 24px;
+    }
+    
+    /* 左侧：数字人视频区 */
+    .video-section {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        backdrop-filter: blur(10px);
+    }
+    
+    .video-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .video-header h2 {
+        color: #1f2937;
+        font-size: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .status-badge::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+    
+    .status-online {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+    .status-online::before {
+        background: #22c55e;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-offline {
+        background: #f3f4f6;
+        color: #9ca3af;
+    }
+    .status-offline::before {
+        background: #9ca3af;
+    }
+    
+    .status-listening {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+    .status-listening::before {
+        background: #dc2626;
+        animation: pulse 1s infinite;
+    }
+    
+    .status-thinking {
+        background: #fef9c3;
+        color: #ca8a04;
+    }
+    .status-thinking::before {
+        background: #eab308;
+        animation: pulse 1.5s infinite;
+    }
+    
+    .status-speaking {
+        background: #d1fae5;
+        color: #059669;
+    }
+    .status-speaking::before {
+        background: #10b981;
+        animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.1); }
+    }
+    
+    #video-container {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #fce7f3 0%, #ffedd5 100%);
+        max-width: 480px;
+        margin: 0 auto;
+    }
+    
+    #video {
+        width: 100%;
+        max-height: 360px;
+        border-radius: 20px;
+        display: block;
+        object-fit: cover;
+    }
+    
+    .video-placeholder {
+        width: 100%;
+        height: 320px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #fce7f3 0%, #ffedd5 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+    }
+    
+    .avatar-icon {
+        font-size: 80px;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .video-placeholder p {
+        color: #6b7280;
+        font-size: 14px;
+    }
+    
+    .video-controls {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    button:hover {
+        transform: translateY(-2px);
+    }
+    
+    button:active {
+        transform: translateY(0);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #f472b6 0%, #fb923c 100%);
+        color: white;
+        box-shadow: 0 4px 14px rgba(244, 114, 182, 0.4);
+    }
+    
+    .btn-primary:hover {
+        box-shadow: 0 6px 20px rgba(244, 114, 182, 0.5);
+    }
+    
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+    
+    .btn-secondary:hover {
+        background: #e5e7eb;
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+    }
+    
+    .btn-danger:hover {
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+    }
+    
+    .btn-record {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+        box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
+    }
+    
+    .btn-record:hover {
+        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+    }
+    
+    .btn-recording {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        animation: pulse 1.5s infinite;
+    }
+    
+    .btn-mic {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 18px;
+        background: linear-gradient(135deg, #f472b6 0%, #fb923c 100%);
+        color: white;
+        box-shadow: 0 4px 14px rgba(244, 114, 182, 0.4);
+    }
+    
+    .btn-icon:hover {
+        box-shadow: 0 6px 20px rgba(244, 114, 182, 0.5);
+    }
+    
+    .main-controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 24px;
+        justify-content: center;
+    }
+    
+    .status-text {
+        text-align: center;
+        margin-top: 12px;
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .status-listening-text { color: #dc2626; }
+    .status-thinking-text { color: #ca8a04; }
+    .status-speaking-text { color: #059669; }
+    
+    /* 右侧：对话区 */
+    .chat-section {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        height: 650px;
+        backdrop-filter: blur(10px);
+        min-width: 500px;
+    }
+    
+    .chat-header {
+        padding: 24px;
+        border-bottom: 1px solid #f3f4f6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .chat-header h3 {
+        color: #1f2937;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .chat-header-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .emotion-badge {
+        padding: 6px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .emotion-neutral { background: #f3f4f6; color: #6b7280; }
+    .emotion-happy { background: #fef3c7; color: #d97706; }
+    .emotion-sad { background: #dbeafe; color: #2563eb; }
+    .emotion-anxious { background: #fee2e2; color: #dc2626; }
+    .emotion-angry { background: #fecaca; color: #b91c1c; }
+    .emotion-tired { background: #dcfce7; color: #16a34a; }
+    .emotion-excited { background: #fce7f3; color: #db2777; }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .message {
+        max-width: 85%;
+        padding: 14px 18px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.6;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message-user {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #f472b6 0%, #fb923c 100%);
+        color: white;
+        border-bottom-right-radius: 6px;
+    }
+    
+    .message-ai {
+        align-self: flex-start;
+        background: #f3f4f6;
+        color: #1f2937;
+        border-bottom-left-radius: 6px;
+    }
+    
+    .message-time {
+        font-size: 11px;
+        opacity: 0.7;
+        margin-top: 6px;
+    }
+    
+    .typing-indicator {
+        display: none;
+        align-self: flex-start;
+        padding: 14px 18px;
+        background: #f3f4f6;
+        border-radius: 18px;
+        border-bottom-left-radius: 6px;
+    }
+    
+    .typing-indicator.active {
+        display: flex;
+        gap: 4px;
+    }
+    
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #9ca3af;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+    }
+    
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-10px); }
+    }
+    
+    .chat-input-area {
+        padding: 20px 24px;
+        border-top: 1px solid #f3f4f6;
+    }
+    
+    .input-container {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+    }
+    
+    textarea {
+        flex: 1;
+        padding: 14px 18px;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        resize: none;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+        transition: all 0.2s;
+        background: #f9fafb;
+    }
+    
+    textarea:focus {
+        border-color: #f472b6;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.1);
+    }
+    
+    .input-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .icon-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 18px;
+        background: linear-gradient(135deg, #f472b6 0%, #fb923c 100%);
+        color: white;
+        box-shadow: 0 4px 14px rgba(244, 114, 182, 0.4);
+    }
+    
+    .icon-btn:hover {
+        box-shadow: 0 6px 20px rgba(244, 114, 182, 0.5);
+    }
+    
+    /* 欢迎消息 */
+    .welcome-message {
+        text-align: center;
+        padding: 40px 20px;
+        color: #9ca3af;
+    }
+    
+    .welcome-message h4 {
+        color: #f472b6;
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+    
+    /* 当前说话显示 */
+    .current-speech {
+        margin-top: 20px;
+        padding: 18px;
+        background: linear-gradient(135deg, #fdf2f8 0%, #fff7ed 100%);
+        border-radius: 16px;
+        min-height: 60px;
+        border: 1px solid #fce7f3;
+    }
+    
+    .current-speech-label {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .current-speech-text {
+        font-size: 14px;
+        color: #1f2937;
+        line-height: 1.6;
+    }
+    
+    /* 语音识别结果 */
+    .transcript-box {
+        margin-top: 16px;
+        padding: 14px 18px;
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        border-radius: 12px;
+        border-left: 4px solid #ef4444;
+    }
+    
+    .transcript-box p {
+        color: #dc2626;
+        font-size: 14px;
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    /* ============ 用户摄像头和情绪分析区域 ============ */
+    .user-camera-section {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #f3f4f6;
+    }
+    
+    .user-camera-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .user-camera-title {
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .user-camera-container {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto;
+        aspect-ratio: 4/3;
+    }
+    
+    .user-camera-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .user-camera-placeholder {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        color: #9ca3af;
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    }
+    
+    .user-camera-placeholder span {
+        font-size: 14px;
+        margin-top: 8px;
+        color: #6b7280;
+    }
+    
+    /* 情绪分析面板 - 图二风格 */
+    .emotion-analysis-panel {
+        margin-top: 16px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .emotion-analysis-header {
+        margin-bottom: 16px;
+    }
+    
+    .emotion-analysis-title {
+        font-size: 13px;
+        font-weight: 500;
+        color: #6b7280;
+        margin-bottom: 12px;
+        display: block;
+    }
+    
+    .emotion-analyzing {
+        display: none !important; /* 隐藏分析中状态 */
+    }
+    
+    /* 情绪概率条 - 图二风格 */
+    .emotion-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .emotion-bar-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .emotion-bar-label {
+        width: 40px;
+        font-size: 13px;
+        color: #374151;
+        text-align: right;
+        flex-shrink: 0;
+    }
+    
+    .emotion-bar-track {
+        flex: 1;
+        height: 10px;
+        background: #f3f4f6;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    .emotion-bar-fill {
+        height: 100%;
+        border-radius: 5px;
+        transition: width 0.3s ease;
+        background: #f43f5e; /* 玫瑰红色 - 所有条都是红色 */
+    }
+    
+    /* 主导情绪使用更深的红色高亮 */
+    .emotion-bar-fill.dominant {
+        background: #e11d48; /* 深玫瑰红色 */
+    }
+    
+    .emotion-bar-value {
+        width: 36px;
+        font-size: 13px;
+        color: #6b7280;
+        text-align: right;
+        flex-shrink: 0;
+    }
+    
+    /* 隐藏主导情绪标签和情绪提示 */
+    .dominant-emotion,
+    .emotion-hint {
+        display: none !important;
+    }
+    
+    /* 摄像头上的情绪标签 */
+    .camera-emotion-overlay {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        backdrop-filter: blur(4px);
+    }
+    
+    /* 自动聊天状态指示器 */
+    .auto-chat-indicator {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: none;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        background: linear-gradient(135deg, #f472b6 0%, #fb923c 100%);
+        color: white;
+        backdrop-filter: blur(4px);
+        animation: pulse 2s infinite;
+        box-shadow: 0 2px 8px rgba(244, 114, 182, 0.4);
+    }
+    
+    .auto-chat-indicator.active {
+        display: inline-flex;
+    }
+    
+    .auto-chat-indicator::before {
+        content: '💬';
+        font-size: 14px;
+    }
+    
+    /* 情绪变化提示 */
+    .emotion-change-toast {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 24px;
+        font-size: 14px;
+        font-weight: 500;
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+    }
+    
+    .emotion-change-toast.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 1100px) {
+        .container {
+            grid-template-columns: 400px 1fr;
+        }
+    }
+    
+    @media (max-width: 900px) {
+        .container {
+            grid-template-columns: 1fr;
+        }
+        
+        #video-container {
+            max-width: 100%;
+        }
+        
+        .chat-section {
+            height: 400px;
+            min-width: auto;
+        }
+    }
+    
+    /* 滚动条美化 */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f3f4f6;
+        border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+    </style>
+</head>
+<body>
+
+<!-- 隐藏的 STUN 配置（兼容 client.js） -->
+<input type="checkbox" id="use-stun" style="display: none;" checked>
+
+<div class="container">
+    <!-- 左侧：数字人视频 -->
+    <div class="video-section">
+        <div class="video-header">
+            <h2>🎭 数字人小暖</h2>
+            <span id="status-badge" class="status-badge status-offline">离线</span>
+        </div>
+        
+        <div id="video-container">
+            <div id="video-placeholder" class="video-placeholder">
+                <div class="avatar-icon">🌸</div>
+                <p>点击"开始视频通话"连接数字人</p>
+            </div>
+            <video id="video" style="display: none;" autoplay playsinline>
+                您的浏览器不支持视频标签
+            </video>
+            <!-- 音频元素用于接收音频流 -->
+            <audio id="audio" style="display: none;" autoplay></audio>
+        </div>
+        
+        <!-- 当前说话内容 -->
+        <div id="current-speech" class="current-speech" style="display: none;">
+            <div class="current-speech-label">💬 当前对话</div>
+            <div id="current-speech-text" class="current-speech-text"></div>
+        </div>
+        
+        <!-- 语音识别结果 -->
+        <div id="transcript-box" class="transcript-box" style="display: none;">
+            <p id="transcript-text">🎤 聆听中...</p>
+        </div>
+        
+        <!-- 主要控制按钮 -->
+        <div class="main-controls">
+            <button id="btn-mic" class="btn-record btn-mic" style="display: none;" 
+                onmousedown="startListening()" 
+                onmouseup="stopListening()"
+                ontouchstart="startListening()"
+                ontouchend="stopListening()">
+                🎤
+            </button>
+            
+            <button id="start" class="btn-primary" onclick="start()" style="padding: 14px 32px; font-size: 15px;">
+                🚀 开始视频通话
+            </button>
+            
+            <button id="stop" class="btn-danger" onclick="stop()" style="display: none; padding: 14px 32px; font-size: 15px;">
+                ⏹ 结束通话
+            </button>
+        </div>
+        
+        <p id="status-text" class="status-text">点击开始连接数字人</p>
+        
+        <!-- ============ 用户摄像头和情绪分析区域 ============ -->
+        <div class="user-camera-section">
+            <!-- 用户摄像头 -->
+            <div class="user-camera-header">
+                <span class="user-camera-title">📹 你的画面</span>
+                <button id="btn-user-camera" class="btn-secondary" style="padding: 8px 16px; font-size: 13px;" onclick="toggleUserCamera()">
+                    📷 打开摄像头
+                </button>
+            </div>
+            
+            <div id="user-camera-container" class="user-camera-container" style="display: none;">
+                <video id="user-camera-video" class="user-camera-video" autoplay playsinline muted></video>
+                <div id="user-camera-placeholder" class="user-camera-placeholder">
+                    👤
+                    <span>摄像头已关闭</span>
+                </div>
+                <!-- 摄像头上的情绪标签 -->
+                <div id="camera-emotion-overlay" class="camera-emotion-overlay" style="display: none;">
+                    <span id="camera-emotion-emoji">😐</span>
+                    <span id="camera-emotion-label">平静</span>
+                    <span id="camera-emotion-confidence" style="opacity: 0.8;">85%</span>
+                </div>
+                
+                <!-- 自动聊天状态指示器 -->
+                <div id="auto-chat-indicator" class="auto-chat-indicator">
+                    小暖正在关心你...
+                </div>
+            </div>
+            
+            <!-- 情绪分析面板 - 图二风格 -->
+            <div id="emotion-analysis-panel" class="emotion-analysis-panel" style="display: none;">
+                <div class="emotion-analysis-header">
+                    <span class="emotion-analysis-title">情绪概率分布</span>
+                </div>
+                
+                <!-- 情绪概率分布 - 显示所有7种情绪 -->
+                <div class="emotion-bars">
+                    <div class="emotion-bar-item">
+                        <span class="emotion-bar-label">平静</span>
+                        <div class="emotion-bar-track">
+                            <div id="bar-neutral" class="emotion-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <span id="value-neutral" class="emotion-bar-value">0%</span>
+                    </div>
+                    <div class="emotion-bar-item">
+                        <span class="emotion-bar-label">开心</span>
+                        <div class="emotion-bar-track">
+                            <div id="bar-happy" class="emotion-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <span id="value-happy" class="emotion-bar-value">0%</span>
+                    </div>
+                    <div class="emotion-bar-item">
+                        <span class="emotion-bar-label">惊讶</span>
+                        <div class="emotion-bar-track">
+                            <div id="bar-surprised" class="emotion-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <span id="value-surprised" class="emotion-bar-value">0%</span>
+                    </div>
+                    <div class="emotion-bar-item">
+                        <span class="emotion-bar-label">愤怒</span>
+                        <div class="emotion-bar-track">
+                            <div id="bar-angry" class="emotion-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <span id="value-angry" class="emotion-bar-value">0%</span>
+                    </div>
+                    <div class="emotion-bar-item">
+                        <span class="emotion-bar-label">悲伤</span>
+                        <div class="emotion-bar-track">
+                            <div id="bar-sad" class="emotion-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <span id="value-sad" class="emotion-bar-value">0%</span>
+                    </div>
+                    <div class="emotion-bar-item">
+                        <span class="emotion-bar-label">厌恶</span>
+                        <div class="emotion-bar-track">
+                            <div id="bar-disgust" class="emotion-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <span id="value-disgust" class="emotion-bar-value">0%</span>
+                    </div>
+                    <div class="emotion-bar-item">
+                        <span class="emotion-bar-label">害怕</span>
+                        <div class="emotion-bar-track">
+                            <div id="bar-scared" class="emotion-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <span id="value-scared" class="emotion-bar-value">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 测试按钮 -->
+        <div style="margin-top: 10px; text-align: center;">
+            <button onclick="testEmotionAPI()" style="padding: 8px 16px; background: #f472b6; color: white; border: none; border-radius: 8px; cursor: pointer;">🧪 测试情绪识别API</button>
+        </div>
+    </div>
+    
+    <!-- 右侧：对话区 -->
+    <div class="chat-section">
+        <div class="chat-header">
+            <h3>💬 陪伴对话</h3>
+            <div class="chat-header-info">
+                <span id="emotion-badge" class="emotion-badge emotion-neutral">平静</span>
+            </div>
+        </div>
+        
+        <div id="chat-messages" class="chat-messages">
+            <div class="welcome-message">
+                <h4>👋 你好！我是小暖</h4>
+                <p>你的专属情感陪护助手<br>点击左侧"开始视频通话"开始对话<br>按住麦克风按钮说话，或输入文字聊天</p>
+            </div>
+        </div>
+        
+        <div id="typing-indicator" class="typing-indicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+        
+        <div class="chat-input-area">
+            <div class="input-container">
+                <textarea id="message-input" rows="2" placeholder="输入消息，按Enter发送..."></textarea>
+                <div class="input-buttons">
+                    <button class="icon-btn" onclick="sendMessage()">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 情绪变化提示 -->
+<div id="emotion-change-toast" class="emotion-change-toast"></div>
+
+<input type="hidden" id="sessionid" value="0">
+
+<script src="./client.js"></script>
+<script src="./livetalking_emotion.js?v=5"></script>
+<script>
+// 情绪数据处理 - 仅用于显示，不触发自动回复
+console.log('【初始化】定义 handleEmotionData（仅显示模式）...');
+
+window.handleEmotionData = function(emotionData) {
+    console.log('【handleEmotionData】接收到情绪数据:', emotionData);
+    // 仅用于显示情绪，不触发自动回复
+};
+
+console.log('【初始化】handleEmotionData 已定义（仅显示模式）');
+</script>
+<script>
+// 对话状态
+let chatState = 'idle';
+let recognition = null;
+let currentTranscript = '';
+let conversationHistory = [];
+
+// 初始化语音识别
+function initSpeechRecognition() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'zh-CN';
+        
+        recognition.onresult = (event) => {
+            const results = event.results;
+            const lastResult = results[results.length - 1];
+            const text = lastResult[0].transcript;
+            currentTranscript = text;
+            document.getElementById('transcript-text').textContent = '🎤 ' + text;
+            if (lastResult.isFinal) {
+                handleVoiceSubmit(text);
+            }
+        };
+        
+        recognition.onerror = (event) => {
+            if (event.error !== 'aborted') setChatState('idle');
+        };
+        
+        recognition.onend = () => {
+            if (chatState === 'listening' && !currentTranscript) {
+                setChatState('idle');
+            }
+        };
+        return true;
+    }
+    return false;
+}
+
+function startListening() {
+    if (!recognition && !initSpeechRecognition()) {
+        alert('浏览器不支持语音识别');
+        return;
+    }
+    if (chatState === 'speaking') stopSpeaking();
+    setChatState('listening');
+    currentTranscript = '';
+    document.getElementById('transcript-box').style.display = 'block';
+    try { recognition.start(); } catch (e) {}
+}
+
+function stopListening() {
+    try { recognition?.stop(); } catch (e) {}
+    if (chatState === 'listening' && !currentTranscript) {
+        setChatState('idle');
+        document.getElementById('transcript-box').style.display = 'none';
+    }
+}
+
+async function handleVoiceSubmit(text) {
+    if (!text.trim()) return;
+    document.getElementById('transcript-box').style.display = 'none';
+    addMessage(text, true);
+    await processMessage(text);
+}
+
+async function processMessage(text) {
+    setChatState('thinking');
+    const sessionid = document.getElementById('sessionid').value;
+    try {
+        const response = await fetch('/human', {
+            body: JSON.stringify({ text, type: 'chat', interrupt: true, sessionid: parseInt(sessionid) }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST'
+        });
+        if (response.ok) {
+            // 解析数字人回复
+            const data = await response.json();
+            console.log('【对话】数字人回复:', data);
+            
+            // 显示数字人回复在对话框中
+            let replyText = '';
+            if (data.text) {
+                replyText = data.text;
+            } else if (data.message && data.message.content) {
+                replyText = data.message.content;
+            } else if (data.content) {
+                replyText = data.content;
+            } else {
+                replyText = '收到你的消息了，让我想想怎么回复你...';
+            }
+            
+            // 延迟显示回复（模拟思考时间）
+            setTimeout(() => {
+                addMessage(replyText, false);
+                setChatState('speaking');
+                
+                // 3秒后恢复空闲状态
+                setTimeout(() => setChatState('idle'), 3000);
+            }, 1000);
+        } else {
+            console.error('【对话】请求失败:', response.status);
+            addMessage('抱歉，我现在有点忙，请稍后再试。', false);
+            setChatState('idle');
+        }
+    } catch (error) {
+        console.error('【对话】发送失败:', error);
+        addMessage('抱歉，我遇到了一点问题。', false);
+        setChatState('idle');
+    }
+}
+
+function setChatState(state) {
+    chatState = state;
+    const statusText = document.getElementById('status-text');
+    const statusBadge = document.getElementById('status-badge');
+    const micBtn = document.getElementById('btn-mic');
+    statusBadge.className = 'status-badge';
+    statusText.className = 'status-text';
+    micBtn?.classList.remove('btn-recording');
+    
+    switch (state) {
+        case 'listening':
+            statusBadge.classList.add('status-listening');
+            statusBadge.textContent = '聆听中';
+            statusText.classList.add('status-listening-text');
+            statusText.textContent = '正在聆听，请说话...';
+            micBtn?.classList.add('btn-recording');
+            break;
+        case 'thinking':
+            statusBadge.classList.add('status-thinking');
+            statusBadge.textContent = '思考中';
+            statusText.classList.add('status-thinking-text');
+            statusText.textContent = '正在思考...';
+            showTyping();
+            break;
+        case 'speaking':
+            statusBadge.classList.add('status-speaking');
+            statusBadge.textContent = '说话中';
+            statusText.classList.add('status-speaking-text');
+            statusText.textContent = '正在说话...';
+            hideTyping();
+            break;
+        default:
+            statusBadge.classList.add('status-online');
+            statusBadge.textContent = '在线';
+            statusText.textContent = '按住麦克风说话，松手自动发送';
+            hideTyping();
+    }
+}
+
+function stopSpeaking() { setChatState('idle'); }
+
+function addMessage(text, isUser = false) {
+    const chatMessages = document.getElementById('chat-messages');
+    const welcomeMsg = chatMessages.querySelector('.welcome-message');
+    if (welcomeMsg) welcomeMsg.remove();
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isUser ? 'message-user' : 'message-ai'}`;
+    const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    messageDiv.innerHTML = `<div>${text}</div><div class="message-time">${time}</div>`;
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showTyping() { document.getElementById('typing-indicator').classList.add('active'); }
+function hideTyping() { document.getElementById('typing-indicator').classList.remove('active'); }
+
+async function sendMessage() {
+    const input = document.getElementById('message-input');
+    const text = input.value.trim();
+    if (!text) return;
+    if (document.getElementById('sessionid').value === '0') {
+        alert('请先点击"开始视频通话"');
+        return;
+    }
+    addMessage(text, true);
+    input.value = '';
+    await processMessage(text);
+}
+
+document.getElementById('message-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+const originalStart = window.start;
+window.start = function() {
+    if (originalStart) originalStart();
+    document.getElementById('video-placeholder').style.display = 'none';
+    document.getElementById('video').style.display = 'block';
+    document.getElementById('start').style.display = 'none';
+    document.getElementById('stop').style.display = 'inline-flex';
+    document.getElementById('btn-mic').style.display = 'flex';
+    document.getElementById('current-speech').style.display = 'block';
+    initSpeechRecognition();
+    setChatState('idle');
+    addMessage('你好！我是小暖，很高兴陪伴你。按住麦克风按钮说话，或者输入文字和我聊天吧！', false);
+};
+
+// ============ 用户摄像头和情绪分析功能 ============
+let userCameraStream = null;
+let isUserCameraOpen = false;
+let emotionAnalysisInterval = null;
+let isAnalyzingEmotion = false;
+
+// 情绪配置 - 与 emotion-companion-web-v2 一致
+const emotionConfig = {
+    angry: { label: '愤怒', emoji: '😠', style: 'emotion-angry-style', barClass: 'angry', badgeClass: 'angry' },
+    disgust: { label: '厌恶', emoji: '🤢', style: 'emotion-disgust-style', barClass: 'disgust', badgeClass: 'disgust' },
+    scared: { label: '害怕', emoji: '😨', style: 'emotion-scared-style', barClass: 'scared', badgeClass: 'anxious' },
+    happy: { label: '开心', emoji: '😊', style: 'emotion-happy-style', barClass: 'happy', badgeClass: 'happy' },
+    sad: { label: '悲伤', emoji: '😢', style: 'emotion-sad-style', barClass: 'sad', badgeClass: 'sad' },
+    surprised: { label: '惊讶', emoji: '😲', style: 'emotion-surprised-style', barClass: 'surprised', badgeClass: 'excited' },
+    neutral: { label: '平静', emoji: '😐', style: 'emotion-neutral-style', barClass: 'neutral', badgeClass: 'neutral' }
+};
+
+// 优化后的情绪分析 - 调用Python API
+async function analyzeEmotion() {
+    try {
+        // 获取用户摄像头视频帧
+        const video = document.getElementById('user-camera-video');
+        if (!video || video.readyState !== 4) {
+            console.log('【情绪分析】视频未准备好，readyState:', video?.readyState);
+            return getDefaultEmotion();
+        }
+        
+        // 创建临时画布 - 提高分辨率以提高检测精度
+        const canvas = document.createElement('canvas');
+        canvas.width = 320;  // 提高到320
+        canvas.height = 240; // 提高到240
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // 获取base64图像
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        
+        // 调用Python情绪分析API
+        const response = await fetch('http://localhost:5000/detect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                image: imageData,
+                smoothing: true,
+                debug: false
+            })
+        });
+        
+        const result = await response.json();
+        
+        // 检查是否有错误或者没有检测到人脸
+        if (result.error || result.faces_detected === 0 || !result.results || result.results.length === 0) {
+            console.log('【情绪分析】API返回错误:', result.error, 'faces_detected:', result.faces_detected, 'results:', result.results);
+            // 没有检测到人脸，返回中性但不触发变化检测
+            return getDefaultEmotion();
+        }
+        
+        // 调试：打印完整的API返回结果
+        console.log('【情绪分析】API返回结果:', JSON.stringify(result.results[0], null, 2));
+        
+        // 转换API返回格式为UI格式
+        const faceResult = result.results[0];
+        const apiProbs = faceResult.probabilities;
+        
+        // API返回的概率已经是小数（0-1范围），直接使用
+        const probabilities = {};
+        for (const [key, value] of Object.entries(apiProbs)) {
+            probabilities[key] = typeof value === 'number' ? value : parseFloat(value);
+        }
+        
+        const emotionResult = {
+            dominant: faceResult.emotion,
+            confidence: faceResult.confidence,
+            probabilities: probabilities
+        };
+        
+        console.log('【情绪分析】检测到情绪:', emotionResult.dominant, '置信度:', emotionResult.confidence.toFixed(2));
+        return emotionResult;
+        
+    } catch (error) {
+        console.error('【情绪分析】API调用失败:', error);
+        console.error('【情绪分析】错误详情:', error.message, error.stack);
+        return getDefaultEmotion();
+    }
+}
+
+// 获取默认中性情绪
+function getDefaultEmotion() {
+    return {
+        dominant: 'neutral',
+        confidence: 0.3,  // 降低置信度，避免误触发
+        probabilities: {
+            angry: 0.05, disgust: 0.05, scared: 0.05,
+            happy: 0.1, sad: 0.05, surprised: 0.05, neutral: 0.65
+        }
+    };
+}
+
+// 测试API连接
+async function testEmotionAPI() {
+    console.log('【测试】开始测试情绪识别API...');
+    
+    const video = document.getElementById('user-camera-video');
+    if (!video || video.readyState !== 4) {
+        console.log('【测试】视频未准备好');
+        alert('摄像头未准备好，请先打开摄像头');
+        return;
+    }
+    
+    // 创建canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = 320;
+    canvas.height = 240;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = canvas.toDataURL('image/jpeg', 0.8);
+    
+    console.log('【测试】图像数据长度:', imageData.length);
+    
+    try {
+        const response = await fetch('http://localhost:5000/detect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                image: imageData,
+                smoothing: true,
+                debug: true
+            })
+        });
+        
+        console.log('【测试】HTTP状态:', response.status);
+        
+        const result = await response.json();
+        console.log('【测试】API返回:', JSON.stringify(result, null, 2));
+        
+        if (result.success && result.faces_detected > 0) {
+            alert('API测试成功！检测到 ' + result.faces_detected + ' 张人脸');
+            // 更新UI
+            updateEmotionUI({
+                dominant: result.results[0].emotion,
+                confidence: result.results[0].confidence,
+                probabilities: result.results[0].probabilities
+            });
+        } else {
+            alert('API返回错误: ' + (result.error || '未检测到人脸'));
+        }
+    } catch (error) {
+        console.error('【测试】API调用失败:', error);
+        alert('API调用失败: ' + error.message);
+    }
+}
+
+// 更新情绪分析UI - 图二风格
+function updateEmotionUI(result) {
+    const dominantEmotion = result.dominant;
+    
+    // 更新摄像头上的情绪标签
+    const config = emotionConfig[dominantEmotion];
+    if (config) {
+        const cameraEmojiEl = document.getElementById('camera-emotion-emoji');
+        const cameraLabelEl = document.getElementById('camera-emotion-label');
+        const cameraConfidenceEl = document.getElementById('camera-emotion-confidence');
+        if (cameraEmojiEl) cameraEmojiEl.textContent = config.emoji;
+        if (cameraLabelEl) cameraLabelEl.textContent = config.label;
+        if (cameraConfidenceEl) cameraConfidenceEl.textContent = Math.round(result.confidence * 100) + '%';
+    }
+    
+    // 更新情绪概率条（显示所有7种情绪）- 全部使用红色
+    const barEmotions = ['neutral', 'happy', 'surprised', 'angry', 'sad', 'disgust', 'scared'];
+    barEmotions.forEach(emo => {
+        const prob = result.probabilities[emo] || 0;
+        const bar = document.getElementById(`bar-${emo}`);
+        const value = document.getElementById(`value-${emo}`);
+        if (bar && value) {
+            bar.style.width = (prob * 100) + '%';
+            value.textContent = Math.round(prob * 100) + '%';
+            // 所有概率条都使用红色
+            bar.classList.add('dominant');
+        }
+    });
+}
+
+// 开始情绪分析
+async function startEmotionAnalysis() {
+    console.log('【情绪分析】启动情绪分析...');
+    if (emotionAnalysisInterval) {
+        console.log('【情绪分析】已在运行中，跳过');
+        return;
+    }
+    
+    const panel = document.getElementById('emotion-analysis-panel');
+    const cameraOverlay = document.getElementById('camera-emotion-overlay');
+    
+    if (!panel) {
+        console.error('【情绪分析】找不到 emotion-analysis-panel 元素');
+        return;
+    }
+    if (!cameraOverlay) {
+        console.error('【情绪分析】找不到 camera-emotion-overlay 元素');
+        return;
+    }
+    
+    // 检查API是否可用
+    try {
+        const healthResponse = await fetch('http://localhost:5000/health', { timeout: 3000 });
+        const healthData = await healthResponse.json();
+        if (!healthData.model_loaded) {
+            console.warn('⚠️ 情绪分析API模型未加载');
+        } else {
+            console.log('✅ 情绪分析API连接正常，版本:', healthData.config || 'v5.0');
+        }
+    } catch (error) {
+        console.warn('⚠️ 无法连接情绪分析API:', error.message);
+    }
+    
+    panel.style.display = 'block';
+    cameraOverlay.style.display = 'inline-flex';
+    console.log('【情绪分析】面板已显示');
+    
+    // 立即执行一次
+    await performEmotionAnalysis();
+    
+    // 每500毫秒分析一次（降低延迟）
+    emotionAnalysisInterval = setInterval(performEmotionAnalysis, 500);
+}
+
+// 执行情绪分析
+async function performEmotionAnalysis() {
+    if (isAnalyzingEmotion) {
+        console.log('【情绪分析】正在分析中，跳过');
+        return;
+    }
+    
+    isAnalyzingEmotion = true;
+    
+    try {
+        const result = await analyzeEmotion();
+        console.log('【情绪分析】分析结果:', result.dominant, '置信度:', result.confidence.toFixed(2));
+        
+        updateEmotionUI(result);
+        
+        // 更新情绪徽章
+        const emotionBadge = document.getElementById('emotion-badge');
+        if (emotionBadge && emotionConfig[result.dominant]) {
+            const config = emotionConfig[result.dominant];
+            emotionBadge.textContent = config.emoji + ' ' + config.label;
+        }
+        
+        // 仅用于显示情绪，不触发自动回复
+        if (window.handleEmotionData) {
+            window.handleEmotionData(result);
+        }
+    } catch (error) {
+        console.error('【情绪分析】失败:', error);
+    } finally {
+        isAnalyzingEmotion = false;
+    }
+}
+
+// 停止情绪分析
+function stopEmotionAnalysis() {
+    console.log('【情绪分析】停止情绪分析');
+    if (emotionAnalysisInterval) {
+        clearInterval(emotionAnalysisInterval);
+        emotionAnalysisInterval = null;
+    }
+}
+
+async function toggleUserCamera() {
+    console.log('【摄像头】切换摄像头状态，当前状态:', isUserCameraOpen ? '打开' : '关闭');
+    const btn = document.getElementById('btn-user-camera');
+    const container = document.getElementById('user-camera-container');
+    const video = document.getElementById('user-camera-video');
+    const placeholder = document.getElementById('user-camera-placeholder');
+    const emotionPanel = document.getElementById('emotion-analysis-panel');
+    const cameraOverlay = document.getElementById('camera-emotion-overlay');
+    
+    if (!isUserCameraOpen) {
+        // 打开摄像头
+        try {
+            console.log('【摄像头】正在请求摄像头权限...');
+            userCameraStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 320, height: 240, facingMode: 'user' },
+                audio: false
+            });
+            console.log('【摄像头】摄像头权限获取成功');
+            video.srcObject = userCameraStream;
+            container.style.display = 'block';
+            placeholder.style.display = 'none';
+            btn.textContent = '📷 关闭摄像头';
+            isUserCameraOpen = true;
+            
+            // 直接显示情绪分析面板
+            console.log('【摄像头】显示情绪分析面板');
+            if (emotionPanel) {
+                emotionPanel.style.display = 'block';
+                console.log('【摄像头】情绪分析面板已显示');
+            } else {
+                console.error('【摄像头】找不到 emotion-analysis-panel');
+            }
+            if (cameraOverlay) {
+                cameraOverlay.style.display = 'inline-flex';
+            }
+            
+            // 启动情绪分析定时器（500ms间隔，降低延迟）
+            setTimeout(() => {
+                startEmotionAnalysis();
+            }, 100);
+        } catch (error) {
+            console.error('【摄像头】无法访问摄像头:', error);
+            alert('无法访问摄像头，请检查权限设置');
+        }
+    } else {
+        // 关闭摄像头
+        if (userCameraStream) {
+            userCameraStream.getTracks().forEach(track => track.stop());
+            userCameraStream = null;
+        }
+        video.srcObject = null;
+        container.style.display = 'none';
+        placeholder.style.display = 'flex';
+        btn.textContent = '📷 打开摄像头';
+        isUserCameraOpen = false;
+        
+        // 直接隐藏情绪分析面板
+        if (emotionPanel) {
+            emotionPanel.style.display = 'none';
+        }
+        if (cameraOverlay) {
+            cameraOverlay.style.display = 'none';
+        }
+        
+        // 停止情绪分析定时器
+        stopEmotionAnalysis();
+    }
+}
+
+
+
+const originalStop = window.stop;
+window.stop = function() {
+    if (originalStop) originalStop();
+    // 关闭用户摄像头和情绪分析
+    if (isUserCameraOpen) {
+        stopEmotionAnalysis();
+        if (userCameraStream) {
+            userCameraStream.getTracks().forEach(track => track.stop());
+            userCameraStream = null;
+        }
+        const video = document.getElementById('user-camera-video');
+        const container = document.getElementById('user-camera-container');
+        const placeholder = document.getElementById('user-camera-placeholder');
+        const btn = document.getElementById('btn-user-camera');
+        video.srcObject = null;
+        container.style.display = 'none';
+        placeholder.style.display = 'flex';
+        btn.textContent = '📷 打开摄像头';
+        isUserCameraOpen = false;
+    }
+    document.getElementById('video-placeholder').style.display = 'flex';
+    document.getElementById('video').style.display = 'none';
+    document.getElementById('start').style.display = 'inline-flex';
+    document.getElementById('stop').style.display = 'none';
+    document.getElementById('btn-mic').style.display = 'none';
+    document.getElementById('current-speech').style.display = 'none';
+    document.getElementById('transcript-box').style.display = 'none';
+    const statusBadge = document.getElementById('status-badge');
+    statusBadge.className = 'status-badge status-offline';
+    statusBadge.textContent = '离线';
+    document.getElementById('status-text').textContent = '点击开始连接数字人';
+};
+</script>
+
+</body>
+</html>
